@@ -1,9 +1,10 @@
 name: Backend Tests
 
 on:
-  push:        # run on every push, any branch
-  pull_request:   # run on every pull request, any branch
-
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 jobs:
   test:
     runs-on: self-hosted
