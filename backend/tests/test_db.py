@@ -4,7 +4,7 @@ from backend.src import db
 def test_db_connection():
     """Test MongoDB connection and collections"""
     # Ensure db object is initialized
-    assert db.db.name == "stock-trading-app"
+    assert db.db.name == "appdb"
 
     # Check collections exist (they may be empty but should be accessible)
     collections = db.db.list_collection_names()
