@@ -47,4 +47,5 @@ jobs:
           MONGO_URI: mongodb://localhost:27017/appdb
           MONGO_DB: appdb
         run: |
-          pytest -v
+          export PYTHONPATH=$PWD/backend
+          pytest tests -v
