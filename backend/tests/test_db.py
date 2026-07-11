@@ -1,5 +1,5 @@
 import pytest
-from backend.src import db
+from src import db
 
 def test_db_connection():
     """Test MongoDB connection and collections"""
