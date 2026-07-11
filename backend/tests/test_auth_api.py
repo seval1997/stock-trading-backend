@@ -1,7 +1,7 @@
 # backend/tests/test_auth_api.py
 import pytest
 from flask import Flask
-from src.api.auth_api import auth_bp
+from backend.src.api.auth_api import auth_bp
 from backend.src import db
 
 @pytest.fixture

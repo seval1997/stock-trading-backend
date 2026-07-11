@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from src.services.auth_service import (
+from backend.src.services.auth_service import (
     login_user,
     logout_user,
     refresh_token

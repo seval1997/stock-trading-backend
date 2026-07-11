@@ -1,5 +1,5 @@
 from flask import Flask
-from src.api.auth_api import auth_bp
+from backend.src.api.auth_api import auth_bp
 
 app = Flask(__name__)
 app.register_blueprint(auth_bp)
