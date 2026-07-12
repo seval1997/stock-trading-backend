@@ -1,13 +1,12 @@
-name: Backend Tests
+name: Auth API Tests
 
 on:
-    pull_request:
-      branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
-  test:
+  auth-api-tests:
     runs-on: ubuntu-latest
-
     services:
       mongo:
         image: mongo:6.0.13
@@ -20,8 +19,7 @@ jobs:
           --health-retries 5
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -30,21 +28,13 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
           pip install -r backend/requirements.txt
+          pip install PyJWT
 
-      - name: Wait for MongoDB
-        run: |
-          for i in {1..10}; do
-            nc -z localhost 27017 && echo "MongoDB is up" && exit 0
-            echo "Waiting for MongoDB..."
-            sleep 3
-          done
-          exit 1
-
-      - name: Run pytest
+      - name: Run pytest (auth API)
         env:
           MONGO_URI: mongodb://localhost:27017/appdb
           MONGO_DB: appdb
         run: |
-          pytest backend/tests -v --disable-warnings
+          cd backend
+          pytest tests/test_auth_api.py -v

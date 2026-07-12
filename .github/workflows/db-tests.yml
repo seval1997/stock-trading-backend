@@ -1,0 +1,40 @@
+name: Database Tests
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  db-tests:
+    runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:6.0.13
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: Install dependencies
+        run: |
+          pip install -r backend/requirements.txt
+          pip install PyJWT
+
+      - name: Run pytest (db)
+        env:
+          MONGO_URI: mongodb://localhost:27017/appdb
+          MONGO_DB: appdb
+        run: |
+          cd backend
+          pytest tests/test_db.py -v

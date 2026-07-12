@@ -1,6 +1,8 @@
 import os
+
 from dotenv import load_dotenv
 from pymongo import MongoClient
+from pymongo.database import Database
 
 # Load environment variables
 load_dotenv()
@@ -8,11 +10,12 @@ load_dotenv()
 MONGO_URI = os.getenv("MONGO_URI")
 MONGO_DB = os.getenv("MONGO_DB", "appdb")
 
+
 # Initialize MongoDB client
-client = MongoClient(MONGO_URI)
+client: MongoClient = MongoClient(MONGO_URI)
 
 # Reference to the database
-db = client[MONGO_DB]
+db: Database = client[MONGO_DB]
 
 # Example: collections
 users_collection = db["users"]

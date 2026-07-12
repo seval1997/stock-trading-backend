@@ -1,11 +1,13 @@
 import pytest
 from backend.app import app
 
+
 @pytest.fixture
 def client():
     app.testing = True
     with app.test_client() as client:
         yield client
+
 
 def test_health_endpoint(client):
     """Test the /api/health endpoint returns correct JSON"""
