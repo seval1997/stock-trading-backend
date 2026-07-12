@@ -38,3 +38,4 @@ jobs:
         run: |
           cd backend
           pytest tests/test_auth_api.py -v
+          pytest tests/test_user_api.py -v
