@@ -32,3 +32,4 @@ black
 pip-audit
 flake8
 bandit
+passlib
