@@ -1,8 +1,8 @@
 name: Dependency Audit
 
 on:
-  pull_request:
-    branches: [ "main" ]
+  push:
+    branches: []
 
 jobs:
   audit:
