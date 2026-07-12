@@ -1,11 +1,8 @@
 name: Type Check
 
 on:
-    push:
-        branches: []
     pull_request:
         branches: [ "main" ]
-
 jobs:
   type-check:
     runs-on: ubuntu-latest

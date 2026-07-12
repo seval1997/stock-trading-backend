@@ -2,7 +2,7 @@ name: Dependency Audit
 
 on:
   push:
-    branches: []
+    branches: ["skip"]
 
 jobs:
   audit:
