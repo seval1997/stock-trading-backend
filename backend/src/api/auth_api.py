@@ -1,12 +1,13 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify, request
 from src.services.auth_service import (
     login_user,
     logout_user,
-    refresh_token
+    refresh_token,
 )
 
 # Create Blueprint for auth routes
 auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
+
 
 # -------------------------------
 # POST /api/auth/login
