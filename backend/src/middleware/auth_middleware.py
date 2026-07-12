@@ -1,8 +1,17 @@
 from functools import wraps
-from flask import request, jsonify
+from flask import request, jsonify, g
 import jwt
+import datetime
 
 SECRET_KEY = "this_is_a_long_random_secret_key_for_testing_123456"  # move to config/env
+
+
+def make_token(user_id="fakeid123"):
+    payload = {
+        "user_id": user_id,
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1),
+    }
+    return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
 
 
 def token_required(f):
@@ -15,8 +24,7 @@ def token_required(f):
         token = auth_header.replace("Bearer ", "")
         try:
             data = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-            # Optionally attach user_id to kwargs
-            kwargs["current_user_id"] = data["user_id"]
+            g.current_user_id = data["user_id"]  # store in flask.g
         except jwt.ExpiredSignatureError:
             return jsonify({"error": "Token expired"}), 401
         except jwt.InvalidTokenError:

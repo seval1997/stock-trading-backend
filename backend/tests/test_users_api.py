@@ -1,6 +1,7 @@
 import pytest
 from flask import Flask
 from src.api.users_api import users_bp
+from src.middleware.auth_middleware import make_token
 
 
 @pytest.fixture
@@ -68,9 +69,8 @@ def test_get_user(client):
         "pan_number": "PAN123",
     }
     client.post("/api/users/sign-up", json=payload)
-
-    response = client.get("/api/users/fakeid123")
-    headers = {"Authorization": "Bearer faketoken"}
+    token = make_token("fakeid123")
+    headers = {"Authorization": f"Bearer {token}"}
     response = client.get("/api/users/fakeid123", headers=headers)
     assert response.status_code == 200
     data = response.get_json()
@@ -88,7 +88,9 @@ def test_update_user(client):
         "pan_number": "PAN123",
     }
     client.post("/api/users/sign-up", json=payload)
-    headers = {"Authorization": "Bearer faketoken"}
+    token = make_token("fakeid123")
+    print("Token for update test:", token)
+    headers = {"Authorization": f"Bearer {token}"}
     # Update username
     response = client.put(
         "/api/users/fakeid123", json={"username": "newname"}, headers=headers
@@ -114,7 +116,8 @@ def test_delete_user(client):
         "pan_number": "PAN123",
     }
     client.post("/api/users/sign-up", json=payload)
-    headers = {"Authorization": "Bearer faketoken"}
+    token = make_token("fakeid123")
+    headers = {"Authorization": f"Bearer {token}"}
     # Delete user
     response = client.delete("/api/users/fakeid123", headers=headers)
     assert response.status_code == 200
