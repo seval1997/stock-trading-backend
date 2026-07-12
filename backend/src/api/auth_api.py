@@ -1,17 +1,22 @@
-from flask import Blueprint, jsonify, request
-from src.services.auth_service import (
-    login_user,
-    logout_user,
-    refresh_token,
-)
+from flask import Blueprint, request, jsonify
+from passlib.hash import pbkdf2_sha256
+import jwt
+import datetime
+from src.repositories.user_repo import UserRepository
 
-# Create Blueprint for auth routes
 auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
 
+SECRET_KEY = "this_is_a_long_random_secret_key_for_testing_123456"  # move to config/env
 
-# -------------------------------
-# POST /api/auth/login
-# -------------------------------
+
+def _build_token(user_id: str) -> str:
+    payload = {
+        "user_id": user_id,
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=2),
+    }
+    return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+
+
 @auth_bp.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
@@ -21,37 +26,35 @@ def login():
     if not username or not password:
         return jsonify({"error": "Username and password required"}), 400
 
-    result = login_user(username, password)
-    if result.get("error"):
-        return jsonify(result), 401
+    user = UserRepository.get_by_username(username)
+    if not user or not pbkdf2_sha256.verify(password, user["password"]):
+        return jsonify({"error": "Invalid username or password"}), 401
 
-    return jsonify(result), 200
+    token = _build_token(str(user["_id"]))
+    return jsonify({"message": "Login successful", "token": token}), 200
 
 
-# -------------------------------
-# POST /api/auth/logout
-# -------------------------------
 @auth_bp.route("/logout", methods=["POST"])
 def logout():
-    token = request.headers.get("Authorization")
-    if not token:
+    auth_header = request.headers.get("Authorization")
+    if not auth_header:
         return jsonify({"error": "Authorization token required"}), 400
+    # In stateless JWT, logout is client‑side (just discard token).
+    return jsonify({"message": "Logout successful"}), 200
 
-    result = logout_user(token)
-    return jsonify(result), 200
 
-
-# -------------------------------
-# POST /api/auth/refresh
-# -------------------------------
 @auth_bp.route("/refresh", methods=["POST"])
 def refresh():
-    token = request.headers.get("Authorization")
-    if not token:
+    auth_header = request.headers.get("Authorization")
+    if not auth_header:
         return jsonify({"error": "Authorization token required"}), 400
 
-    result = refresh_token(token)
-    if result.get("error"):
-        return jsonify(result), 401
-
-    return jsonify(result), 200
+    token = auth_header.replace("Bearer ", "")
+    try:
+        data = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        new_token = _build_token(data["user_id"])
+        return jsonify({"token": new_token}), 200
+    except jwt.ExpiredSignatureError:
+        return jsonify({"error": "Token expired"}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"error": "Invalid token"}), 401
