@@ -39,3 +39,5 @@ jobs:
           cd backend
           pytest tests/test_auth_api.py -v
           pytest tests/test_users_api.py -v
+          pytest tests/test_stock_api_real.py -v
+          pytest tests/test_stock_api_mock.py -v
